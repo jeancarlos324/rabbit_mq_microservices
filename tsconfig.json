@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "target": "ES2020",
+    "lib": ["ES2020", "ES2019", "ES2021", "ESNext", "DOM"],
+    "module": "commonjs",
+    // "paths": {
+    //   "../*": ["./src/*"]
+    // },
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

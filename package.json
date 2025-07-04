@@ -1,0 +1,33 @@
+{
+  "name": "rabbit_mq_microservices",
+  "version": "1.0.1",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node index.ts",
+    "dev": "nodemon index.ts",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "rabbitmq",
+    "microservices",
+    "typescript"
+  ],
+  "author": "Jean Ticona",
+  "license": "ISC",
+  "description": "This is a package that allows you to create microservices with RabbitMQ",
+  "dependencies": {
+    "amqplib": "^0.10.8"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/node": "^24.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "nodemon": "^3.1.10"
+  }
+}
