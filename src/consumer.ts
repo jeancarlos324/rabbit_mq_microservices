@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import RabbitServer from './server';
-import type { Channel, ConsumeMessage } from 'amqplib';
+import type { Channel, ConsumeMessage, Options } from 'amqplib';
 
 class Consumer extends EventEmitter {
   private server: RabbitServer;
@@ -25,11 +25,21 @@ class Consumer extends EventEmitter {
   public async consume(
     queue: string,
     exchange: string,
-    callback: (msg: ConsumeMessage | null, channel: Channel) => void
+    callback: (msg: ConsumeMessage | null, channel: Channel) => void,
+    options?: {
+      optionsQueue: Options.AssertQueue;
+      optionsExchange: Options.AssertExchange;
+    }
   ) {
     const channel = this.server.getChannel();
-    await channel.assertExchange(exchange, 'fanout', { durable: true });
-    await channel.assertQueue(queue, { durable: true });
+    await channel.assertExchange(exchange, 'fanout', {
+      durable: true,
+      ...options?.optionsExchange,
+    });
+    await channel.assertQueue(queue, {
+      durable: true,
+      ...options?.optionsQueue,
+    });
     await channel.bindQueue(queue, exchange, '');
     /**
      * Callback for consuming messages from a queue.

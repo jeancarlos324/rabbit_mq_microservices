@@ -24,13 +24,23 @@ class Producer extends EventEmitter {
     queue: string,
     exchange: string,
     message: string,
-    options?: Options.Publish
+
+    options?: {
+      optionsQueue: Options.AssertQueue;
+      optionsExchange: Options.AssertExchange;
+      optionsPublish: Options.Publish;
+    }
   ) {
     const channel = this.server.getChannel();
     await channel.assertExchange(exchange, 'fanout', { durable: true });
     await channel.assertQueue(queue, { durable: true });
     await channel.bindQueue(queue, exchange, '');
-    channel.publish(exchange, '', Buffer.from(message), options);
+    channel.publish(
+      exchange,
+      '',
+      Buffer.from(message),
+      options?.optionsPublish
+    );
     this.emit('produce', queue);
   }
 }
