@@ -126,21 +126,36 @@ import Producer from './src/producer';
 import RabbitServer from './src/server';
 class server {
   public static async main() {
-    const server = await RabbitServer.getInstance(
-      'amqp://admin:adimroot@localhost'
-    );
+    console.log('hello world');
+    const url = 'amqps://admin:adminroot@server.rabbit.auladm.com:5672';
+    const server = await RabbitServer.getInstance(url);
+    // 'amqp://admin:adimroot@localhost'
+    const channel = server.getChannel();
+    await channel.assertQueue('my-queue_queue1751638450966', { durable: true });
+    // await channel.assertQueue('notifications_queue', { durable: true });
+    // channel.consume(
+    //   'notifications_queue',
+    //   (msg) => {
+    //     if (msg) {
+    //       const data = JSON.parse(msg.content.toString());
+    //       console.log(data);
+    //       channel.ack(msg);
+    //     }
+    //   },
+    //   { noAck: false }
+    // );
     // const consume = new Consumer(server);
     // consume.consume('my-queue', 'my-exchange', (msg) => console.log(msg));
     let aux = 0;
     const message = { id: 2, message: 'hello world' };
-    setInterval(() => {
-      aux++;
-      const producer = new Producer(server);
-      message.id = aux;
-      producer.sendMessage('my-queue', 'my-exchange', JSON.stringify(message), {
-        persistent: true,
-      });
-    }, 5000);
+    // setInterval(() => {
+    //   aux++;
+    //   const producer = new Producer(server);
+    //   message.id = aux;
+    //   producer.sendMessage('my-queue', 'my-exchange', JSON.stringify(message), {
+    //     persistent: true,
+    //   });
+    // }, 5000);
   }
 }
 

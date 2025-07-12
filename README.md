@@ -4,6 +4,7 @@
 
 This is a package that allows you to create microservices with RabbitMQ and TypeScript in a simple and easy way.
 
+
 ## Installation
 
 ```bash
