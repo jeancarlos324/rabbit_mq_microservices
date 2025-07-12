@@ -1,13 +1,15 @@
+import { EventEmitter } from 'events';
 import RabbitServer from './server';
-import type { ConsumeMessage } from 'amqplib';
+import type { Channel, ConsumeMessage } from 'amqplib';
 
-class Consumer {
+class Consumer extends EventEmitter {
   private server: RabbitServer;
   /**
    * Creates a new instance of the Consumer class.
    * @param server The RabbitServer instance to use to consume messages.
    */
   constructor(server: RabbitServer) {
+    super();
     this.server = server;
   }
   /**
@@ -20,10 +22,10 @@ class Consumer {
    * @throws {Error} If the callback function throws an error.
    * @throws {Error} If the message could not be acknowledged.
    */
-  public async consume<K = unknown>(
+  public async consume(
     queue: string,
     exchange: string,
-    callback: (msg: K) => void
+    callback: (msg: ConsumeMessage | null, channel: Channel) => void
   ) {
     const channel = this.server.getChannel();
     await channel.assertExchange(exchange, 'fanout', { durable: true });
@@ -37,18 +39,25 @@ class Consumer {
      * @throws {Error} If the message could not be acknowledged.
      * @returns {void}
      */
-    const messageCallback = (msg: ConsumeMessage | null) => {
-      try {
+    // const messageCallback = (msg: ConsumeMessage | null) => {
+    //   try {
+    //     if (!msg) throw new Error('No message received', { cause: msg });
+    //     const data = JSON.parse(msg.content.toString());
+    //     callback(data);
+    //     channel.ack(msg);
+    //   } catch (error) {
+    //     console.error('Error processing message:', error);
+    //   }
+    // };
+    channel.consume(
+      queue,
+      (msg) => {
         if (!msg) throw new Error('No message received', { cause: msg });
-        const data = JSON.parse(msg.content.toString());
-        callback(data);
-        channel.ack(msg);
-      } catch (error) {
-        console.error('Error processing message:', error);
-      }
-    };
-    channel.consume(queue, messageCallback, { noAck: false });
-    console.log(`Waiting for messages in queue: ${queue}`);
+        callback(msg, channel);
+      },
+      { noAck: false }
+    );
+    this.emit('connect', queue);
   }
 }
 

@@ -4,12 +4,17 @@
 
 This is a package that allows you to create microservices with RabbitMQ and TypeScript in a simple and easy way.
 
-
 ## Installation
 
 ```bash
 npm install rabbit_mq_microservices
 ```
+### If you want use amqplib dependence, install types
+
+```bash
+npm install --save-dev @types/amqplib
+```
+
 
 #### Types
 
@@ -41,9 +46,15 @@ import { RabbitServer, Producer } from 'rabbit_mq_microservices';
 const server = await RabbitServer.getInstance(
   'amqp://user:password@localhost:port'
 );
-const producer = new Producer(chanel);
-producer.sendMessage('queue_name', 'exchange_name', 'message', {
-  persistent: true,
+const message = { id: 1, name: 'John Doe' };
+const producer = new Producer(server);
+setInterval(() => {
+  producer.sendMessage('my-queue', 'my-exchange', JSON.stringify(message), {
+    persistent: true,
+  });
+}, 3000);
+producer.on('produce', (queue) => {
+  console.log(`Message sent to queues: ${queue}`);
 });
 ```
 
@@ -51,13 +62,22 @@ producer.sendMessage('queue_name', 'exchange_name', 'message', {
 
 ```typescript
 import { RabbitServer, Consumer } from 'rabbit_mq_microservices';
-
 const server = await RabbitServer.getInstance(
   'amqp://user:password@localhost:port'
 );
 const consumer = new Consumer(server);
-consumer.consume<typeof message>('my-queue', (msg) => {
-  console.log('Received message:', msg);
+consumer.consume('my-queue-${uuid}', 'my-exchange', (msg, channel) => {
+  try {
+    if (!msg) throw new Error('No message received', { cause: msg });
+    const data = JSON.parse(msg.content.toString());
+    channel.ack(msg);
+  } catch (error) {
+    console.error('Error processing message:', error);
+  }
+});
+
+consumer.on('consume', (queue) => {
+  console.log(`Message received from queue: ${queue}`);
 });
 ```
 

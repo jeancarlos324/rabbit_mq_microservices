@@ -126,12 +126,18 @@ import Producer from './src/producer';
 import RabbitServer from './src/server';
 class server {
   public static async main() {
-    console.log('hello world');
-    const url = 'amqps://admin:adminroot@server.rabbit.auladm.com:5672';
+    const url = 'amqp://admin:adminroot@server.rabbit.auladm.com:5672';
     const server = await RabbitServer.getInstance(url);
+    server.onConnect(() => {
+      console.log('Connected to RabbitMQssss');
+    });
+
+    // server.connection.on('error', (err) => {
+    //   console.error('RabbitMQ connection error test:', err);
+    // });
     // 'amqp://admin:adimroot@localhost'
-    const channel = server.getChannel();
-    await channel.assertQueue('my-queue_queue1751638450966', { durable: true });
+    // const channel = server.getChannel();
+    // await channel.assertQueue('my-queue_queue1751638450966', { durable: true });
     // await channel.assertQueue('notifications_queue', { durable: true });
     // channel.consume(
     //   'notifications_queue',
@@ -144,18 +150,34 @@ class server {
     //   },
     //   { noAck: false }
     // );
-    // const consume = new Consumer(server);
-    // consume.consume('my-queue', 'my-exchange', (msg) => console.log(msg));
-    let aux = 0;
-    const message = { id: 2, message: 'hello world' };
+    // const consumer = new Consumer(server);
+    // consumer.consume('my-queue-unique', 'my-exchange', (msg, channel) => {
+    //   try {
+    //     if (!msg) throw new Error('No message received', { cause: msg });
+    //     const data = JSON.parse(msg.content.toString());
+    //     console.log(data);
+    //     channel.ack(msg);
+    //   } catch (error) {
+    //     console.error('Error processing message:', error);
+    //   }
+    // });
+
+    // consumer.on('consume', (queue) => {
+    //   console.log(`Message received from queue: ${queue}`);
+    // });
+    // let aux = 0;
+    // const message = { id: 2, message: 'hello world' };
+    // const producer = new Producer(server);
     // setInterval(() => {
     //   aux++;
-    //   const producer = new Producer(server);
     //   message.id = aux;
     //   producer.sendMessage('my-queue', 'my-exchange', JSON.stringify(message), {
     //     persistent: true,
     //   });
-    // }, 5000);
+    // }, 3000);
+    // producer.on('produce', (queue) => {
+    //   console.log(`Message sent to queues: ${queue}`);
+    // });
   }
 }
 

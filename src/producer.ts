@@ -1,13 +1,15 @@
+import { EventEmitter } from 'events';
 import RabbitServer from './server';
 import type { Options } from 'amqplib';
 
-class Producer {
+class Producer extends EventEmitter {
   private server: RabbitServer;
   /**
    * Creates a new instance of the Producer class.
    * @param server The RabbitServer instance to use to send messages.
    */
   constructor(server: RabbitServer) {
+    super();
     this.server = server;
   }
   /**
@@ -29,7 +31,7 @@ class Producer {
     await channel.assertQueue(queue, { durable: true });
     await channel.bindQueue(queue, exchange, '');
     channel.publish(exchange, '', Buffer.from(message), options);
-    console.log(`Message sent to queue: ${queue}`);
+    this.emit('produce', queue);
   }
 }
 

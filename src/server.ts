@@ -1,5 +1,6 @@
-import amqp, {  Channel, ChannelModel } from 'amqplib';
-class RabbitServer {
+import amqp, { Channel, ChannelModel } from 'amqplib';
+import { EventEmitter } from 'events';
+class RabbitServer extends EventEmitter {
   /**
    * The singleton instance of the RabbitServer class.
    * @private
@@ -22,7 +23,7 @@ class RabbitServer {
    * The RabbitMQ connection.
    * @private
    */
-  private connection!: ChannelModel;
+  public connection!: ChannelModel;
 
   /**
    * The RabbitMQ channel.
@@ -38,6 +39,7 @@ class RabbitServer {
    */
   private constructor(url?: string) {
     if (!url) throw new Error('No url provided');
+    super();
     this.url = url;
   }
 
@@ -48,19 +50,44 @@ class RabbitServer {
    * established.
    * @throws {Error} If the connection to the RabbitMQ server fails.
    */
+
+  /**
+   * Indicates whether the RabbitServer instance is connected to the RabbitMQ server.
+   * @internal
+   */
+  private isConnected = false;
+
+/**
+ * Registers a callback to be invoked when the RabbitMQ server connection is established.
+ * If the connection is already established, the callback is invoked immediately.
+ * Otherwise, the callback is registered to be called once the 'connect' event is emitted.
+ *
+ * @param callback The callback function to execute upon connection.
+ */
+
+  public onConnect(callback: () => void) {
+    if (this.isConnected) {
+      callback();
+      return;
+    }
+    this.once('connect', callback);
+  }
+
   private async init(): Promise<void> {
     try {
       this.connection = await this.server.connect(this.url);
       this.channel = await this.connection.createChannel();
       this.connection.on('error', (err) => {
-        console.error('RabbitMQ connection error:', err);
+        throw new Error(err.message);
       });
       this.connection.on('close', () => {
         console.log('RabbitMQ connection closed');
       });
-      console.log('Connected to RabbitMQ');
+      this.isConnected = true;
     } catch (error) {
-      throw new Error('Failed to connect to RabbitMQ');
+      throw new Error(
+        JSON.stringify({ message: 'Error connecting to RabbitMQ', error })
+      );
     }
   }
 
@@ -78,7 +105,6 @@ class RabbitServer {
     }
     return RabbitServer.instance;
   }
-
 
   /**
    * Returns the RabbitMQ channel.
