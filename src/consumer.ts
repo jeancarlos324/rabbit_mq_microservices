@@ -27,8 +27,8 @@ class Consumer extends EventEmitter {
     exchange: string,
     callback: (msg: ConsumeMessage | null, channel: Channel) => void,
     options?: {
-      optionsQueue: Options.AssertQueue;
-      optionsExchange: Options.AssertExchange;
+      optionsQueue?: Options.AssertQueue;
+      optionsExchange?: Options.AssertExchange;
     }
   ) {
     const channel = this.server.getChannel();
