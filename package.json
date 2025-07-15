@@ -1,6 +1,6 @@
 {
   "name": "rabbit_mq_microservices",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -26,8 +26,9 @@
   "devDependencies": {
     "@types/amqplib": "^0.10.7",
     "@types/node": "^24.0.9",
+    "dotenv": "^17.2.0",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
-    "nodemon": "^3.1.10"
+    "typescript": "^5.8.3"
   }
 }

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import RabbitServer from './server';
 import type { Channel, ConsumeMessage, Options } from 'amqplib';
+import { IRabbitListeners, RabbitConsumerMessage } from './types/global';
 
 class Consumer extends EventEmitter {
   private server: RabbitServer;
@@ -21,7 +22,8 @@ class Consumer extends EventEmitter {
    * @throws {Error} If the queue, exchange, or bind operation fails.
    * @throws {Error} If the callback function throws an error.
    * @throws {Error} If the message could not be acknowledged.
-   */
+    @deprecated
+  */
   public async consume(
     queue: string,
     exchange: string,
@@ -68,6 +70,56 @@ class Consumer extends EventEmitter {
       { noAck: false }
     );
     this.emit('connect', queue);
+  }
+/**
+ * Consumes messages from a RabbitMQ queue with specified routing keys.
+ * @param queue The name of the queue to consume from.
+ * @param exchange The name of the exchange to consume from.
+ * @param callback The callback function to handle each message.
+ * @param {RabbitConsumerMessage} options Options for consuming messages.
+ * @param {string} [options.type='fanout'] The type of the exchange.
+ * @param {string[]} options.routingKeys The routing keys to bind the queue to.
+ * @param {Options.AssertExchange} [options.optionsExchange] Options for asserting the exchange.
+ * @param {Options.AssertQueue} [options.optionsQueue] Options for asserting the queue.
+ * @param {number} [options.prefetch=10] The number of messages to prefetch.
+ * @throws {Error} If no message is received or if the message could not be acknowledged.
+ * @emits consume Emitted when a message is received from the queue.
+ */
+
+  public async consumeQueue(
+    queue: string,
+    exchange: string,
+    callback: (msg: ConsumeMessage | null, channel: Channel) => void,
+    {
+      type = 'fanout',
+      routingKeys,
+      optionsExchange,
+      optionsQueue,
+      prefetch = 10,
+    }: RabbitConsumerMessage
+  ) {
+    const channel = this.server.getChannel();
+    await channel.assertExchange(exchange, type, {
+      durable: true,
+      ...optionsExchange,
+    });
+    await channel.assertQueue(queue, {
+      durable: true,
+      ...optionsQueue,
+    });
+    for (const key of routingKeys) {
+      await channel.bindQueue(queue, exchange, type === 'fanout' ? '' : key);
+    }
+    channel.prefetch(prefetch);
+    channel.consume(
+      queue,
+      (msg) => {
+        if (!msg) throw new Error('No message received', { cause: msg });
+        callback(msg, channel);
+      },
+      { noAck: false }
+    );
+    this.emit('consume', queue);
   }
 }
 
