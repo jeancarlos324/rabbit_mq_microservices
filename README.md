@@ -1,5 +1,5 @@
 # Rabbitmq microservices package
-
+![Rabbit mq](https://www.rabbitmq.com/img/rabbitmq-logo-with-name.svg)
 [![npm version](https://badge.fury.io/js/rabbit_mq_microservices.svg)](https://badge.fury.io/js/rabbit_mq_microservices)
 
 This is a package that allows you to create microservices with RabbitMQ and TypeScript in a simple and easy way.
