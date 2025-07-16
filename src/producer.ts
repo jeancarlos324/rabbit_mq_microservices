@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import RabbitServer from './server';
 import type { Options } from 'amqplib';
-import { RabbitProducerMessage } from './types/global';
+import type { RabbitProducerMessage } from './global';
 
 class Producer extends EventEmitter {
   private server: RabbitServer;

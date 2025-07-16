@@ -5,7 +5,6 @@ config();
 class server {
   public static async main() {
     const url = process.env.RABBITMQ_URL;
-    console.log(url);
     const server = await RabbitServer.getInstance(url);
     server.onConnect(() => {
       console.log('Connected to RabbitMQssss');

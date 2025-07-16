@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
-import RabbitServer from './server';
 import { Channel } from 'amqplib';
-import { RetryConsumerMessage } from './types/global';
+import type { RetryConsumerMessage } from './global';
 
 class Retry extends EventEmitter {
   public static queue = 'retry';

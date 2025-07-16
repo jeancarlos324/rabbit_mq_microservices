@@ -1,10 +1,4 @@
-import type { Channel, ConsumeMessage, Options } from 'amqplib';
-/**
- * Options for creating a RabbitMQ queue.
- * @typedef {Object} RabbitOptions
- * @property {string} queue - The name of the RabbitMQ queue.
- * @property {string} exchange - The name of the RabbitMQ exchange.
- */
+import type { Options } from 'amqplib';
 export interface RabbitOptions {
   queue: string;
   exchange: string;
@@ -39,11 +33,13 @@ export interface RetryConsumerMessage {
   typeExchange?: 'fanout' | 'direct' | 'topic' | 'headers';
 }
 
-export interface IRabbitListeners {
+export interface IRabbitListeners<K = null> {
   [queue: string]: {
     exchange: string;
-    handler: (data: uknown) => Promise<void> | void;
+    handler: (data: K) => Promise<void> | void;
     maxRetries: number;
     retryDelay: number;
   };
 }
+
+export {};

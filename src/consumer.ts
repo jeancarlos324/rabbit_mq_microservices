@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import RabbitServer from './server';
 import type { Channel, ConsumeMessage, Options } from 'amqplib';
-import { IRabbitListeners, RabbitConsumerMessage } from './types/global';
+import { RabbitConsumerMessage } from './global';
 
 class Consumer extends EventEmitter {
   private server: RabbitServer;
@@ -71,20 +71,20 @@ class Consumer extends EventEmitter {
     );
     this.emit('connect', queue);
   }
-/**
- * Consumes messages from a RabbitMQ queue with specified routing keys.
- * @param queue The name of the queue to consume from.
- * @param exchange The name of the exchange to consume from.
- * @param callback The callback function to handle each message.
- * @param {RabbitConsumerMessage} options Options for consuming messages.
- * @param {string} [options.type='fanout'] The type of the exchange.
- * @param {string[]} options.routingKeys The routing keys to bind the queue to.
- * @param {Options.AssertExchange} [options.optionsExchange] Options for asserting the exchange.
- * @param {Options.AssertQueue} [options.optionsQueue] Options for asserting the queue.
- * @param {number} [options.prefetch=10] The number of messages to prefetch.
- * @throws {Error} If no message is received or if the message could not be acknowledged.
- * @emits consume Emitted when a message is received from the queue.
- */
+  /**
+   * Consumes messages from a RabbitMQ queue with specified routing keys.
+   * @param queue The name of the queue to consume from.
+   * @param exchange The name of the exchange to consume from.
+   * @param callback The callback function to handle each message.
+   * @param {RabbitConsumerMessage} options Options for consuming messages.
+   * @param {string} [options.type='fanout'] The type of the exchange.
+   * @param {string[]} options.routingKeys The routing keys to bind the queue to.
+   * @param {Options.AssertExchange} [options.optionsExchange] Options for asserting the exchange.
+   * @param {Options.AssertQueue} [options.optionsQueue] Options for asserting the queue.
+   * @param {number} [options.prefetch=10] The number of messages to prefetch.
+   * @throws {Error} If no message is received or if the message could not be acknowledged.
+   * @emits consume Emitted when a message is received from the queue.
+   */
 
   public async consumeQueue(
     queue: string,
@@ -92,7 +92,7 @@ class Consumer extends EventEmitter {
     callback: (msg: ConsumeMessage | null, channel: Channel) => void,
     {
       type = 'fanout',
-      routingKeys,
+      routingKeys = [],
       optionsExchange,
       optionsQueue,
       prefetch = 10,
